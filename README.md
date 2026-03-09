@@ -19,4 +19,4 @@ Instead of relying on basic Hex/RGB comparisons which fail to accurately represe
 
 ## 🚀 Live Demo
 The application is currently being packaged for cloud deployment. 
-**[Live link coming soon]**
+**[https://foundation-shade-identifier.streamlit.app/]**
