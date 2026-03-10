@@ -39,7 +39,7 @@ def find_comparison(image):
         face = detection_result.face_landmarks[0]
 
         # we are going for the left cheek (index 117)
-        cheek_point = face[117]
+        cheek_point = face[10]
 
         center_x = int(cheek_point.x * w)
         center_y = int(cheek_point.y * h)

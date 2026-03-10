@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="darkreader-lock">
+    <meta name="color-scheme" content="light only">
+    <title>LUMINA | The Premium Shade Finder</title>
+    <!-- Massive and Elegant Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="app-layout">
+        
+        <!-- Left Column: Control Center -->
+        <section class="control-center">
+            
+            <header class="brand-header">
+                <h1 class="brand-title">Lumina.</h1>
+                <p class="brand-subtitle">Discover your skin's true match with absolute precision.</p>
+            </header>
+
+            <div class="interaction-zone">
+                
+                <!-- Action Tabs -->
+                <div class="action-tabs">
+                    <button class="tab-btn active" id="tab-upload">Upload Photo</button>
+                    <button class="tab-btn" id="tab-camera">Take Photo</button>
+                </div>
+
+                <!-- Pane: Upload -->
+                <div class="action-pane active-pane" id="pane-upload">
+                    <div class="dropzone" id="dropzone">
+                        <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp" hidden>
+                        <div class="dropzone-content" id="dropzone-content">
+                            <span class="plus-icon">+</span>
+                            <span class="dropzone-text">Drop a high-resolution selfie here<br>or click to browse</span>
+                        </div>
+                        <div class="preview-container" id="preview-container" style="display: none;">
+                            <img id="image-preview" src="" alt="Selected image">
+                            <button class="icon-btn" id="remove-btn" type="button" title="Remove">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pane: Camera -->
+                <div class="action-pane" id="pane-camera" style="display: none;">
+                    <div class="camera-container" id="camera-container">
+                        <video id="webcam-video" autoplay playsinline></video>
+                        <div class="camera-overlay">
+                            <button class="camera-action-btn" id="snap-btn">Snap Selfie</button>
+                        </div>
+                    </div>
+                    <!-- Hidden canvas for capturing the frame -->
+                    <canvas id="camera-canvas" style="display: none;"></canvas>
+                </div>
+
+                <!-- Flow Controls -->
+                <div class="controls">
+                    <button class="primary-btn" id="analyze-btn" disabled>Find My Match</button>
+                </div>
+                
+                <!-- Loading State overlayting the control center or results -->
+                <div class="status-msg" id="status-msg" style="display: none;">
+                    <div class="premium-spinner"></div>
+                    <span id="status-text">Analyzing pigmentation...</span>
+                </div>
+
+            </div>
+
+            <footer class="control-footer">
+                <p>Ensuring privacy. Photos are not saved.</p>
+            </footer>
+
+        </section>
+
+        <!-- Right Column: Results -->
+        <section class="results-container" id="results-container">
+            <!-- Results dynamically injected here -->
+            <div class="empty-results-state" id="empty-state">
+                <div class="decorative-line"></div>
+                <p>Your flawless matches will appear here.</p>
+            </div>
+            
+            <div class="matches-grid" id="matches-grid">
+                <!-- Cards injected here by JS -->
+            </div>
+            
+            <button class="secondary-btn" id="reset-btn" style="display: none;">Start Over</button>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

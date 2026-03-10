@@ -2,8 +2,17 @@ import cv2
 import numpy as np
 from fastapi import FastAPI, File, UploadFile
 from Setup import find_comparison
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -24,5 +33,5 @@ async def analyze_shade(file: UploadFile = File(...)):
 
     final_data = result.to_dict(orient="records")
 
-    return {"results": final_data}
+    return final_data
 

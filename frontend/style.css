@@ -1,0 +1,481 @@
+/* style.css - Bold, High-End Aesthetic (Lumina Redesign) */
+
+:root {
+    /* Sophisticated Palette */
+    --bg-color: #F8F7F4; /* Very soft, warm architectural white */
+    --ink-black: #0D0D0D; /* Absolute stark black for maximum contrast */
+    --ink-gray: #595959;
+    --border-soft: #E5E4E0;
+    --card-surface: #FFFFFF;
+    
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-ui: 'Inter', sans-serif;
+    
+    /* Animations & Timing */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-med: 0.6s;
+    --duration-fast: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-ui);
+    background-color: var(--bg-color);
+    color: var(--ink-black);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Layout: Two-Column Split */
+.app-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+}
+
+/* Left Column: Control Center */
+.control-center {
+    padding: 4rem 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid var(--border-soft);
+    background-color: var(--bg-color);
+    position: relative;
+    z-index: 10;
+}
+
+/* Typography Overhaul */
+.brand-header {
+    margin-bottom: 3.5rem;
+}
+
+.brand-title {
+    font-family: var(--font-heading);
+    font-size: clamp(5rem, 8vw, 9rem); /* Massive scaling typography */
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    margin-left: -0.05em; /* Optical alignment */
+    color: var(--ink-black);
+}
+
+.brand-subtitle {
+    font-family: var(--font-ui);
+    font-size: clamp(1rem, 1.2vw, 1.25rem);
+    font-weight: 300;
+    color: var(--ink-gray);
+    margin-top: 1.5rem;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+/* Interactivity Section */
+.interaction-zone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 480px;
+}
+
+/* Tabs */
+.action-tabs {
+    display: flex;
+    gap: 2rem;
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 1rem;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-gray);
+    cursor: pointer;
+    position: relative;
+    padding: 0.5rem 0;
+    transition: color var(--duration-fast);
+}
+
+.tab-btn.active {
+    color: var(--ink-black);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem; /* Align with border-bottom */
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--ink-black);
+}
+
+/* Panes */
+.action-pane {
+    animation: fadeReveal var(--duration-med) var(--ease-out-expo);
+}
+
+/* Upload Interface */
+.dropzone {
+    border: 1px solid var(--border-soft);
+    background-color: var(--card-surface);
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color var(--duration-fast);
+}
+
+.dropzone:hover, .dropzone.drag-active {
+    border-color: var(--ink-black);
+}
+
+.dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    pointer-events: none;
+}
+
+.plus-icon {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    line-height: 1;
+    font-weight: 300;
+}
+
+.dropzone-text {
+    font-size: 0.9rem;
+    color: var(--ink-gray);
+    line-height: 1.6;
+}
+
+/* Preview Image container */
+.preview-container {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-color);
+}
+
+.preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%); /* High-fashion look subtly applied */
+}
+
+.icon-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #FFF;
+    color: #000;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Camera Interface */
+.camera-container {
+    position: relative;
+    height: 320px;
+    background-color: #000;
+    overflow: hidden;
+}
+
+#webcam-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Mirror effect */
+}
+
+.camera-overlay {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.camera-action-btn {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 40px;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.camera-action-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Flow Buttons */
+.controls {
+    margin-top: 1rem;
+}
+
+.primary-btn {
+    width: 100%;
+    background-color: var(--ink-black);
+    color: #FFF;
+    font-family: var(--font-ui);
+    padding: 1.25rem;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background-color var(--duration-fast);
+}
+
+.primary-btn:hover:not(:disabled) {
+    background-color: #222;
+}
+
+.primary-btn:disabled {
+    background-color: #D0D0D0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Right Column: Results */
+.results-container {
+    background-color: var(--card-surface);
+    padding: 4rem 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow-y: auto;
+}
+
+.empty-results-state {
+    text-align: center;
+    color: var(--ink-gray);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.decorative-line {
+    width: 1px;
+    height: 100px;
+    background-color: var(--border-soft);
+}
+
+.matches-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    width: 100%;
+    max-width: 500px;
+    margin-inline: auto;
+}
+
+/* Premium Card */
+.match-card {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    border: 1px solid var(--border-soft);
+    background-color: var(--card-surface);
+    /* No soft shadows, strict sharp borders for high-end feel */
+    opacity: 0;
+    transform: translateX(40px);
+    animation: slideInRight var(--duration-med) var(--ease-out-expo) forwards;
+}
+
+/* Huge swatches */
+.swatch-lg {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+    /* 3D glossy highlight using semi-transparent box-shadows */
+    box-shadow: 
+        inset 0 8px 12px -2px rgba(255,255,255,0.7), /* Specular top highlight */
+        inset 0 -4px 10px rgba(0,0,0,0.1); /* Deep inner shadow */
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.match-brand {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-gray);
+    font-weight: 500;
+}
+
+.match-product {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: var(--ink-black);
+}
+
+.match-shade {
+    font-size: 0.95rem;
+    color: var(--ink-gray);
+    margin-top: 0.5rem;
+}
+
+.secondary-btn {
+    align-self: center;
+    background: none;
+    border: 1px solid var(--ink-black);
+    color: var(--ink-black);
+    padding: 0.85rem 2rem;
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.secondary-btn:hover {
+    background-color: var(--ink-black);
+    color: #FFF;
+}
+
+/* Loading status */
+.status-msg {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--ink-gray);
+    font-family: var(--font-ui);
+    font-style: italic;
+}
+
+.premium-spinner {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--border-soft);
+    border-top-color: var(--ink-black);
+    border-radius: 50%;
+    animation: simpleSpin 0.8s linear infinite;
+}
+
+.control-footer {
+    margin-top: auto;
+    font-size: 0.75rem;
+    color: var(--ink-gray);
+    letter-spacing: 0.05em;
+}
+
+/* Animations */
+@keyframes slideInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes simpleSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Stagger cards */
+.match-card:nth-child(1) { animation-delay: 0.1s; }
+.match-card:nth-child(2) { animation-delay: 0.25s; }
+.match-card:nth-child(3) { animation-delay: 0.4s; }
+
+/* Mobile Responsiveness (< 768px) */
+@media (max-width: 768px) {
+    .app-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .control-center {
+        padding: 3rem 1.5rem 4rem 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border-soft);
+        min-height: auto; /* Let it scale */
+    }
+
+    .brand-title {
+        font-size: 4.5rem; /* Still large, but fit for mobile */
+    }
+
+    .brand-subtitle {
+        max-width: 100%;
+        font-size: 1.1rem;
+    }
+
+    .interaction-zone {
+        max-width: 100%;
+    }
+
+    .results-container {
+        padding: 4rem 1.5rem;
+        min-height: 80vh;
+    }
+
+    .match-card {
+        padding: 1.5rem;
+        gap: 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .swatch-lg {
+        width: 60px;
+        height: 60px;
+    }
+}
