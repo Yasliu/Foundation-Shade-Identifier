@@ -39,35 +39,42 @@ def find_comparison(image):
         face = detection_result.face_landmarks[0]
 
         # we are going for the left cheek (index 117)
-        cheek_point = face[10]
+        landmark_indices = [10, 4, 152, 117, 346]
 
-        center_x = int(cheek_point.x * w)
-        center_y = int(cheek_point.y * h)
-    
-        patch_size = 20
+        patch_size = 10
         half_size = patch_size // 2
 
-        y1 = max(0, center_y - half_size)
-        y2 = min(h, center_y + half_size)
-        x1 = max(0, center_x - half_size)
-        x2 = min(w, center_x + half_size)
+        all_patches = []
 
-        patch_rgb = image[y1:y2 , x1:x2]
+        for idx in landmark_indices:
+            landmark = face[idx]
 
-        lab_img = cv2.cvtColor(patch_rgb, cv2.COLOR_RGB2LAB)
-        # km = kmeans
-        km_lab = lab_img.reshape(-1, 3)
-        kmeans = KMeans(n_clusters=3, random_state=42, n_init='auto')
-        kmeans.fit(km_lab)
+            center_x, center_y = int(landmark.x * w), int(landmark.y * h)
 
-        labels=kmeans.labels_
-        centroids=kmeans.cluster_centers_
+            y1 = max(0, center_y - half_size)
+            y2 = min(h, center_y + half_size)
+            x1 = max(0, center_x - half_size)
+            x2 = min(w, center_x + half_size)
 
-        # This provides the 3 rows of LAB values from which it sorts and chooses the middle value
+            patch_rgb = image[y1:y2 , x1:x2]
 
-        target_lab = centroids[centroids[:, 0].argsort()][1]
+            all_patches.append(patch_rgb)
 
+        # Convert all patches to LAB and find the dominant color
+        five_centroids = []
+        for patch in all_patches:
+            lab_patch = cv2.cvtColor(patch, cv2.COLOR_RGB2LAB)
+            centroid = np.mean(lab_patch, axis=(0,1))
+            five_centroids.append(centroid)
+
+        five_centroids = np.array(five_centroids)
+
+        sorted_labs = five_centroids[five_centroids[:, 0].argsort()]
+        trimmed_labs = sorted_labs[1:4]
+
+        target_lab = np.mean(trimmed_labs, axis=0)
         best_matches = find_my_match(target_lab)
+
     else:
         print("Error: No face detected in the image.")
         return None
