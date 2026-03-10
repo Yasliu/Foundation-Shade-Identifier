@@ -2,7 +2,7 @@
 title: Lumina Engine
 emoji: 💄
 colorFrom: gray
-colorTo: black
+colorTo: gray
 sdk: docker
 pinned: false
 ---
