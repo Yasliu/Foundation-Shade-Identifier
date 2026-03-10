@@ -29,8 +29,8 @@ Instead of relying on basic Hex/RGB comparisons which fail to accurately represe
 
 ## Contributors
 
-* **Yiso** - Lead Engineer: Backend API architecture, DevOps deployment, and computer vision integration.
-* **Anood** - Co-Creator & Product Strategy: Architected the 5-point spatial averaging algorithm, defined the cross-brand recommendation logic, served as the Domain Expert on cosmetic color theory, and led UI/UX testing.
+- **Yiso** - Lead Engineer: Backend API architecture, DevOps deployment, and computer vision integration
+- **Anood** - Co-Creator & Product Strategy: Architected the 5-point spatial averaging algorithm, defined the cross-brand recommendation logic, served as the Domain Expert on cosmetic color theory, and led UI/UX testing
 
 ## Live Demo
 
