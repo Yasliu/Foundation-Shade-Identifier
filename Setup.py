@@ -77,7 +77,7 @@ def find_comparison(image):
 
         # averaging the middle
         target_lab = trimmed_labs.mean(axis=0)
-        target_lab[0] = target_lab[0] * 1.03
+        target_lab[0] = target_lab[0] * 1.10
         target_lab = np.clip(target_lab, [0, -128, -128], [100, 127, 127])
 
         best_matches = find_my_match(target_lab)
