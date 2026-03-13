@@ -197,22 +197,46 @@ document.addEventListener('DOMContentLoaded', () => {
     async function processImage() {
         analyzeBtn.disabled = true;
         statusMsg.style.display = 'flex';
+        statusText.innerText = 'Analyzing pigmentation...';
+        statusText.style.color = 'var(--text-muted)';
         matchesGrid.innerHTML = '';
 
         try {
             const formData = new FormData();
             formData.append('file', selectedFile);
 
+            console.log('[Lumina] Sending request to:', API_URL);
+            console.log('[Lumina] File:', selectedFile.name, selectedFile.type, selectedFile.size, 'bytes');
+
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: formData
             });
 
+            // Always read the raw body text first so we can log it on any error
+            const rawText = await response.text();
+            console.log(`[Lumina] Response status: ${response.status}`);
+            console.log('[Lumina] Raw response body:', rawText);
+
             if (!response.ok) {
-                throw new Error(`Server returned ${response.status}`);
+                if (response.status === 503) {
+                    statusText.innerText = 'Server is waking up — please wait a moment and try again.';
+                    statusText.style.color = '#BE4B5E';
+                    setTimeout(() => { resetUI(true); }, 4000);
+                    return;
+                }
+                throw new Error(`HTTP ${response.status}: ${rawText}`);
             }
 
-            const data = await response.json();
+            // Parse the already-read text as JSON
+            let data;
+            try {
+                data = JSON.parse(rawText);
+            } catch (parseErr) {
+                throw new Error(`JSON parse failed: ${rawText}`);
+            }
+
+            console.log('[Lumina] Parsed data:', data);
 
             // Backend returns null when no face is detected in the image
             if (data === null) {
@@ -220,20 +244,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (!Array.isArray(data) || data.length === 0) {
-                throw new Error("Invalid response format.");
+                throw new Error(`Unexpected format — got: ${JSON.stringify(data)}`);
             }
 
             renderMatches(data);
 
         } catch (error) {
-            console.error('API Error:', error);
+            console.error('[Lumina] processImage error:', error.message);
             if (error.message === 'NO_FACE') {
-                statusText.innerText = "No face detected. Please use a clearer, well-lit selfie.";
+                statusText.innerText = 'No face detected. Please use a clearer, well-lit selfie.';
             } else {
-                statusText.innerText = "Error analyzing image. Please try again.";
+                statusText.innerText = 'Error analyzing image. Check the browser console (F12) for details.';
             }
-            statusText.style.color = "#BE4B5E";
-            setTimeout(() => { resetUI(true); }, 3500);
+            statusText.style.color = '#BE4B5E';
+            setTimeout(() => { resetUI(true); }, 4000);
         }
     }
 
