@@ -108,13 +108,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleFile(file) {
         if (!file.type.startsWith('image/')) return alert("Please upload a valid image file.");
-        selectedFile = file;
+
         const reader = new FileReader();
         reader.onload = (e) => {
+            // Show the preview immediately from the original file
             imagePreview.src = e.target.result;
             dropzoneContent.style.display = 'none';
             previewContainer.style.display = 'flex';
-            analyzeBtn.disabled = false;
+
+            // Re-encode through a canvas to produce a clean 3-channel JPEG.
+            // This strips alpha channels, EXIF rotation, and exotic sub-formats
+            // that can make cv2.imdecode crash on the backend (causing HTTP 500).
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width  = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    selectedFile = new File([blob], 'upload.jpg', { type: 'image/jpeg' });
+                    console.log('[Lumina] Re-encoded file:', selectedFile.size, 'bytes');
+                    analyzeBtn.disabled = false;
+                }, 'image/jpeg', 0.92);
+            };
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
