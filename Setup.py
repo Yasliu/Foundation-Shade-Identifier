@@ -5,8 +5,7 @@ import mediapipe as mp
 import numpy as np
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
-from sklearn.cluster import KMeans
-from skimage.color import deltaE_cie76
+from skimage.color import deltaE_ciede2000
 
 
 # Loading the image from the directory using imread
@@ -38,41 +37,38 @@ def find_comparison(image):
         # Get the first face detected
         face = detection_result.face_landmarks[0]
 
-        # we are going for the left cheek (index 117)
-        landmark_indices = [10, 4, 152, 117, 346]
+        # we are going for the left cheek polygon
+        cheek_indices = [117, 118, 101, 121, 47, 126, 209]
 
-        patch_size = 10
-        half_size = patch_size // 2
+        polygon_points = np.array([
+            [int(face[i].x * w), int(face[i].y * h)] for i in cheek_indices
+        ], dtype=np.int32)
 
-        all_patches = []
+        #creation of mask and pixels
+        mask = np.zeros((h, w), dtype=np.uint8)
+        cv2.fillPoly(mask, [polygon_points], 255)
 
-        for idx in landmark_indices:
-            landmark = face[idx]
+        # bitwise_and to get the pixels of the polygon
+        cheek_pixels = image[mask > 0] # Array of RGB pixels
 
-            center_x, center_y = int(landmark.x * w), int(landmark.y * h)
+        # Color conversion to LAB
+        cheek_pixels_float = cheek_pixels.astype(np.float32) / 255.0
+        cheek_pixels_reshaped = cheek_pixels_float.reshape(1, -1, 3)
+        lab_pixels = cv2.cvtColor(cheek_pixels_reshaped, cv2.COLOR_RGB2LAB)[0]
 
-            y1 = max(0, center_y - half_size)
-            y2 = min(h, center_y + half_size)
-            x1 = max(0, center_x - half_size)
-            x2 = min(w, center_x + half_size)
+        # sort based on lightness
+        sorted_indices = lab_pixels[:, 0].argsort()
+        sorted_labs = lab_pixels[sorted_indices]
 
-            patch_rgb = image[y1:y2 , x1:x2]
+        # dropping the first and last 20%
+        num_pixels = len(sorted_labs)
+        lower_bound = int(num_pixels * 0.2)
+        upper_bound = int(num_pixels * 0.8)
+        trimmed_labs = sorted_labs[lower_bound:upper_bound]
 
-            all_patches.append(patch_rgb)
+        # averaging the middle
+        target_lab = trimmed_labs.mean(axis=0)
 
-        # Convert all patches to LAB and find the dominant color
-        five_centroids = []
-        for patch in all_patches:
-            lab_patch = cv2.cvtColor(patch, cv2.COLOR_RGB2LAB)
-            centroid = np.mean(lab_patch, axis=(0,1))
-            five_centroids.append(centroid)
-
-        five_centroids = np.array(five_centroids)
-
-        sorted_labs = five_centroids[five_centroids[:, 0].argsort()]
-        trimmed_labs = sorted_labs[1:4]
-
-        target_lab = np.mean(trimmed_labs, axis=0)
         best_matches = find_my_match(target_lab)
 
     else:
@@ -86,7 +82,7 @@ def find_my_match(target_lab):
     foundation_matrix = df[['L_val', 'a_val', 'b_val']].values.astype(float)
 
     temp_df = df.copy()
-    temp_df['dist'] = deltaE_cie76(target_lab, foundation_matrix)
+    temp_df['dist'] = deltaE_ciede2000(target_lab, foundation_matrix)
     temp_df = temp_df.sort_values('dist')
 
     # Ensuring non-duplicate brands for variation
