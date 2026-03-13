@@ -1,0 +1,558 @@
+/* style.css — Lumina Redesign */
+
+html {
+    font-size: 22px; /* base scale — increased for larger overall UI */
+}
+
+:root {
+    --bg:           #e8d5c8; /* background */
+    --maroon:       #5e2746; /* lumina logo, buttons */
+    --maroon-dark:  #4a1e38;
+    --card-bg:      #f5f5f5; /* white containers → #f5f5f5 */
+    --dropzone-bg:  #f5f5f5; /* inner picture box → #f5f5f5 */
+    --text-primary: #1a1a1a; /* subtitle, active tabs */
+    --text-muted:   #a1a1a1; /* dropzone hint, footer */
+    --btn-text:     #f7f0e2; /* writing in buttons */
+    --btn-outline:  #9a4f75; /* button border */
+    --font-logo:    'Great Vibes', cursive;
+    --font-body:    'Cormorant Garamond', serif;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-fast: 0.25s;
+    --duration-med:  0.5s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2.5rem 1rem 2rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Page Wrapper ── */
+.page-wrapper {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.75rem;
+    flex: 1;
+    justify-content: center;
+}
+
+/* ── Header ── */
+.brand-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.brand-title {
+    font-family: var(--font-logo);
+    font-size: clamp(4rem, 13vw, 6.5rem);
+    font-weight: 400;
+    color: var(--maroon);
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+}
+
+.brand-subtitle {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
+}
+
+/* ── App Card ── */
+.app-card {
+    width: 100%;
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding-bottom: 1.75rem;
+    /* overflow must stay visible so the (?) tooltip is not clipped */
+    overflow: visible;
+    box-shadow: 0 8px 32px rgba(94, 39, 70, 0.10), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Tabs ── */
+.action-tabs {
+    display: flex;
+    border-bottom: 1px solid #EDE5E0;
+    margin-bottom: 1.5rem;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden; /* clip tab bg to card corners now that card itself is visible */
+}
+
+.tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 1.1rem 0;
+    position: relative;
+    transition: color var(--duration-fast);
+}
+
+.tab-btn.active {
+    color: var(--text-primary);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 12%;
+    width: 76%;
+    height: 2px;
+    background-color: var(--text-primary);
+}
+
+/* ── Panes ── */
+.action-pane {
+    padding: 0 1.5rem;
+    animation: fadeReveal var(--duration-fast) var(--ease-out-expo);
+}
+
+/* ── Dropzone ── */
+.dropzone {
+    background-color: var(--dropzone-bg);
+    border-radius: 14px;
+    height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background-color var(--duration-fast);
+}
+
+.dropzone:hover,
+.dropzone.drag-active {
+    background-color: #E8DDD8;
+}
+
+.dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.65rem;
+    pointer-events: none;
+    color: var(--text-muted);
+}
+
+.plus-icon {
+    font-family: var(--font-body);
+    font-size: 2.25rem;
+    line-height: 1;
+    font-weight: 300;
+    color: var(--maroon);
+}
+
+.dropzone-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* ── Preview ── */
+.preview-container {
+    position: absolute;
+    inset: 0;
+}
+
+.preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 14px;
+}
+
+.icon-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: #FFF;
+    color: #000;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+/* ── Camera ── */
+.camera-container {
+    border-radius: 14px;
+    height: 340px;
+    overflow: hidden;
+    background-color: #000;
+}
+
+#webcam-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    background-color: #000;
+    opacity: 1;
+    mix-blend-mode: normal;
+    display: block;
+}
+
+.capture-btn {
+    display: block;
+    margin: 0.9rem auto 0;
+    background-color: var(--maroon);
+    color: var(--btn-text);
+    border: 1.5px solid var(--btn-outline);
+    border-radius: 40px;
+    padding: 0.65rem 2.25rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    transition: background-color var(--duration-fast);
+}
+
+.capture-btn:hover {
+    background-color: var(--maroon-dark);
+}
+
+/* ── Flow Controls ── */
+.controls {
+    padding: 0 1.5rem;
+    margin-top: 1.25rem;
+}
+
+.find-match-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.find-match-wrapper .primary-btn {
+    flex: 1;
+}
+
+/* ── Primary Button ── */
+.primary-btn {
+    width: 100%;
+    background-color: var(--maroon);
+    color: var(--btn-text);
+    font-family: var(--font-body);
+    padding: 1rem 1.5rem;
+    border: 1.5px solid var(--btn-outline);
+    border-radius: 40px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background-color var(--duration-fast);
+}
+
+.primary-btn:hover:not(:disabled) {
+    background-color: var(--maroon-dark);
+}
+
+.primary-btn:disabled {
+    background-color: #C9B5B8;
+    cursor: not-allowed;
+}
+
+/* ── Help Icon & Tooltip ── */
+.help-icon {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text-muted);
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color var(--duration-fast), color var(--duration-fast);
+    user-select: none;
+}
+
+.help-icon:hover {
+    border-color: var(--maroon);
+    color: var(--maroon);
+}
+
+.help-icon::after {
+    content: 'what is a well lit face?';
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-primary);
+    color: #FFF;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast);
+    font-style: normal;
+}
+
+.help-icon::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--text-primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast);
+}
+
+.help-icon:hover::after,
+.help-icon:hover::before {
+    opacity: 1;
+}
+
+/* ── Loading Status ── */
+.status-msg {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-style: italic;
+    padding: 1rem 1.5rem 0;
+    justify-content: center;
+}
+
+.premium-spinner {
+    width: 21px;
+    height: 21px;
+    border: 1.5px solid #E0D0C8;
+    border-top-color: var(--maroon);
+    border-radius: 50%;
+    animation: simpleSpin 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+/* ── Results Section ── */
+.results-section {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.matches-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+/* ── Pill Cards ── */
+.pill-card {
+    background-color: var(--card-bg);
+    border-radius: 50px;
+    padding: 1.1rem 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeReveal var(--duration-med) var(--ease-out-expo) forwards;
+}
+
+.pill-card:nth-child(1) { animation-delay: 0.05s; }
+.pill-card:nth-child(2) { animation-delay: 0.18s; }
+.pill-card:nth-child(3) { animation-delay: 0.31s; }
+
+.pill-swatch {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.07);
+    box-shadow:
+        inset 0 5px 8px -2px rgba(255,255,255,0.65),
+        inset 0 -3px 6px rgba(0,0,0,0.1);
+}
+
+.pill-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+}
+
+.pill-brand {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-style: normal;
+}
+
+.pill-product {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pill-shade {
+    font-size: 0.88rem;
+    color: var(--maroon);
+    font-style: italic;
+}
+
+/* ── Secondary (Start Over) ── */
+.secondary-btn {
+    width: auto;
+    padding: 0.85rem 2.75rem;
+    font-size: 0.78rem;
+}
+
+/* ── Footer ── */
+.page-footer {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-align: center;
+    font-style: italic;
+    margin-top: 1.5rem; /* push footer further down from the card */
+}
+
+/* ── Modal ── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--duration-fast), visibility var(--duration-fast);
+}
+
+.modal-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-box {
+    background-color: #f5f5f5; /* match the new container color */
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    border-radius: 16px;
+    position: relative;
+    animation: fadeReveal var(--duration-fast) var(--ease-out-expo);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color var(--duration-fast);
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+}
+
+.modal-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+.modal-caption {
+    font-size: 0.88rem;
+    color: #1a1a1a; /* cool near-black for modal text */
+    line-height: 1.65;
+    text-align: left;
+}
+
+/* ── Animations ── */
+@keyframes fadeReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes simpleSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+    body {
+        padding: 1.75rem 0.75rem 1.5rem;
+    }
+    .brand-title {
+        font-size: 4rem;
+    }
+    .pill-card {
+        padding: 1rem 1.25rem;
+    }
+    .secondary-btn {
+        padding: 0.85rem 2rem;
+    }
+}
