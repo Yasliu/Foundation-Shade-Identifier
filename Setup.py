@@ -62,8 +62,8 @@ def find_comparison(image):
 
         # dropping the first and last 20%
         num_pixels = len(sorted_labs)
-        lower_bound = int(num_pixels * 0.2)
-        upper_bound = int(num_pixels * 0.8)
+        lower_bound = int(num_pixels * 0.40)
+        upper_bound = int(num_pixels * 0.95)
         trimmed_labs = sorted_labs[lower_bound:upper_bound]
 
         # averaging the middle
