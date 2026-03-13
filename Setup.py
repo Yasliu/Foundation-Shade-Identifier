@@ -5,7 +5,8 @@ import mediapipe as mp
 import numpy as np
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
-from skimage.color import deltaE_ciede2000
+from sklearn.cluster import KMeans
+from skimage.color import deltaE_cie76
 
 
 # Loading the image from the directory using imread
@@ -37,46 +38,44 @@ def find_comparison(image):
         # Get the first face detected
         face = detection_result.face_landmarks[0]
 
-        # we are going for the left cheek polygon
-        left_cheek_indices = [117, 118, 101, 121, 47, 126, 209]
-        right_cheek_indices = [346, 347, 330, 350, 277, 355, 429]
-        forehead_indices = [10, 338, 297, 332, 284, 251, 21, 54, 103, 67, 109]
+        # we are going for the left cheek (index 117)
+        landmark_indices = [10, 4, 152, 117, 346]
 
-        def get_lab(indices):
-            polygon = np.array([[int(face[i].x * w), int(face[i].y * h)] for i in indices], dtype=np.int32)
-            mask = np.zeros((h,w), dtype=np.uint8)
-            cv2.fillPoly(mask, [polygon], 255)
-            pixels = image[mask > 0]
-            pixels_float = pixels.astype(np.float32) / 255.0
-            pixel_reshaped = pixels_float.reshape(1, -1, 3)
-            return cv2.cvtColor(pixel_reshaped, cv2.COLOR_RGB2LAB)[0]
+        patch_size = 10
+        half_size = patch_size // 2
 
-        left_lab = get_lab(left_cheek_indices)
-        right_lab = get_lab(right_cheek_indices)
-        forehead_lab = get_lab(forehead_indices)
+        all_patches = []
 
-        left_mean_L = left_lab[:, 0].mean()
-        right_mean_L = right_lab[:, 0].mean()
-        forehead_mean_L = forehead_lab[:, 0].mean()
+        for idx in landmark_indices:
+            landmark = face[idx]
 
-        if right_mean_L > left_mean_L and right_mean_L > forehead_mean_L:
-            best_lab = right_lab
-        elif left_mean_L > right_mean_L and left_mean_L > forehead_mean_L:
-            best_lab = left_lab
-        else:
-            best_lab = forehead_lab
+            center_x, center_y = int(landmark.x * w), int(landmark.y * h)
 
-        # sort based on lightness
-        sorted_indices = best_lab[:, 0].argsort()
-        sorted_labs = best_lab[sorted_indices]
+            y1 = max(0, center_y - half_size)
+            y2 = min(h, center_y + half_size)
+            x1 = max(0, center_x - half_size)
+            x2 = min(w, center_x + half_size)
 
-        num_pixels = len(sorted_labs)
-        lower_bound = int(num_pixels * 0.40)
-        upper_bound = int(num_pixels * 0.95)
-        trimmed_labs = sorted_labs[lower_bound:upper_bound]
+            patch_rgb = image[y1:y2 , x1:x2]
 
-        # averaging the middle
-        target_lab = trimmed_labs.mean(axis=0)
+            all_patches.append(patch_rgb)
+
+        # Convert all patches to LAB and find the dominant color
+        five_centroids = []
+        for patch in all_patches:
+            lab_patch = cv2.cvtColor(patch, cv2.COLOR_RGB2LAB)
+            centroid = np.mean(lab_patch, axis=(0,1))
+            five_centroids.append(centroid)
+
+        five_centroids = np.array(five_centroids)
+
+        sorted_labs = five_centroids[five_centroids[:, 0].argsort()]
+        trimmed_labs = sorted_labs[1:4]
+
+        target_lab = np.mean(trimmed_labs, axis=0)
+        target_lab[0] = min(target_lab[0] * 1.05, 100.0)
+        target_lab[1] = target_lab[1] * 0.90
+        target_lab[2] = target_lab[2] * 0.90
 
         best_matches = find_my_match(target_lab)
 
@@ -91,28 +90,12 @@ def find_my_match(target_lab):
     foundation_matrix = df[['L_val', 'a_val', 'b_val']].values.astype(float)
 
     temp_df = df.copy()
-    temp_df['dist'] = deltaE_ciede2000(target_lab, foundation_matrix)
+    temp_df['dist'] = deltaE_cie76(target_lab, foundation_matrix)
     temp_df = temp_df.sort_values('dist')
 
     # Ensuring non-duplicate brands for variation
     unique_brands_df = temp_df.drop_duplicates(subset=['brand'], keep='first')
-    anchors = unique_brands_df.head(3)
 
-    final_results = []
-    for _, anchor in anchors.iterrows():
-        # Ensuring same brand and product
-        brand_shades = df[(df['brand'] == anchor['brand']) & (df['product'] == anchor['product'])]
-
-        # sorting by lightness 
-        lighter_shades = brand_shades[brand_shades['L_val'] > anchor['L_val']].sort_values('L_val')
-
-        # finding the closest match
-        if not lighter_shades.empty:
-            lighter_match = lighter_shades.iloc[0]
-            final_results.append(lighter_match[['brand', 'product', 'name', 'hex']])
-        else:
-            final_results.append(anchor[['brand', 'product', 'name', 'hex']])
-
-    top_3 = pd.DataFrame(final_results).to_dict(orient='records')
+    top_3 = unique_brands_df.head(3)[['brand','product','name','hex']].copy()
 
     return top_3    
