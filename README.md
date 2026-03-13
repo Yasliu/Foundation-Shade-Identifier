@@ -11,18 +11,18 @@ pinned: false
 
 An end-to-end computer vision and machine learning pipeline designed to find the mathematically perfect foundation makeup match from a single selfie.
 
-Instead of relying on basic Hex/RGB comparisons which fail to accurately represent human skin, this application leverages the LAB color space, Delta-E algorithms, and dynamic spatial averaging to match extracted skin tones against a database of over 5,000 real-world cosmetic products.
+Instead of relying on basic Hex/RGB comparisons which fail to accurately represent human skin, this application leverages the CIELAB color space, advanced CIE2000 Delta-E algorithms, and dynamic spatial averaging to match extracted skin tones against a database of over 5,000 real-world cosmetic products.
 
 ## The Problem We Solve
 
 Current virtual shade-matching tools fail consumers across several critical technical pain points. Lumina was engineered to directly solve these issues:
 
 * **Environmental & Technical Barriers:** Many users report that a shade suggested by an app in one lighting condition looks completely different in another [1][2]. 
-  * *The Lumina Solution:* Implements a 5-point facial spatial averaging algorithm that calculates luminance to automatically reject specular glare (camera flash) and environmental shadows, isolating the true skin tone.
-* **Skin Complexity & Undertone Confusion:** Existing tools often fail to account for complex skin conditions. Furthermore, a major pain point is the neglect of olive undertones, which can be particularly difficult to match as they often appear "muted" or "greenish" rather than just yellow or pink [3][4].
-  * *The Lumina Solution:* Abandons subjective "warm, cool, or neutral" marketing labels. By converting RGB pixels to the CIELAB color space, the engine calculates the mathematical Delta-E distance of exact pigments. 
+  * *The Lumina Solution:* Implements dynamic lighting compensation by extracting multi-point polygons from both cheeks, automatically discarding the shadowed side of the face. It then applies an asymmetric statistical trim to reject specular glare (camera flash) and micro-shadows, mathematically isolating the true, well-lit base skin tone.
+* **Skin Complexity & Undertone Confusion:** Existing tools often fail to account for complex skin conditions and neglect olive undertones, which can be particularly difficult to match as they often appear "muted" or "greenish" rather than strictly yellow or pink [3][4].
+  * *The Lumina Solution:* Abandons subjective "warm, cool, or neutral" marketing labels. By converting pixels to the CIELAB color space, the engine calculates the $\Delta E_{00}$ (CIE2000) distance, an advanced perceptual algorithm that explicitly penalizes hue/undertone mismatches heavier than lightness mismatches. 
 * **Data Bias & Product Waste:** Algorithms are frequently not trained on diverse skin tones [5]. This lack of accuracy leads to "shade hoarding," where consumers purchase multiple bottles of foundation in different shades, hoping one will work [6]. This results in financial loss and significant environmental waste.
-  * *The Lumina Solution:* Matches user data against a robust matrix of over 5,000 physical products, outputting the top 3 mathematical matches across unique brands to guarantee diverse options and inclusivity.
+  * *The Lumina Solution:* Matches user data against a robust matrix of over 5,000 physical products, outputting the top 3 mathematical matches strictly across unique brands to guarantee diverse formulas and inclusivity.
 
 ---
 **Market Research References:**
@@ -35,10 +35,10 @@ Current virtual shade-matching tools fail consumers across several critical tech
 
 ## The Architecture Pipeline
 
-1. **Multi-Point Facial Mapping:** Utilizes Google's MediaPipe FaceLandmarker to detect facial topology and extract 5 specific micro-crops (Forehead, Nose Tip, Chin, Left Cheek, Right Cheek).
-2. **Spatial Averaging & Outlier Rejection:** Calculates the perceived luminance of each extracted zone. It automatically rejects the absolute brightest (specular glare) and darkest (shadows) patches, mathematically averaging the remaining mid-tones to isolate the True Base skin color.
-3. **Mathematical Translation:** Converts the True Base RGB values into the LAB color space, which maps directly to how the human eye actually perceives color differences.
-4. **The Matching Engine:** Computes the Delta-E (CIE76) distance between the user's LAB coordinates and a pre-cleaned dataset of foundation shades, filtering for the top 3 matches strictly across unique cosmetic brands.
+1. **Dynamic Facial Mapping:** Utilizes Google's MediaPipe FaceLandmarker to detect facial topology and extract precise, multi-point polygon regions of both the left and right cheeks.
+2. **Lighting Compensation & Asymmetric Trim:** Evaluates the perceived luminance of both extracted regions, automatically discarding the polygon located in shadow. The system then flattens the well-lit pixels and applies an asymmetric statistical trim (dropping the bottom 40% of shadow/contour pixels and the top 5% of specular glare) to isolate the pure True Base skin color.
+3. **Mathematical Translation:** Converts the extracted, trimmed RGB array into the CIELAB color space, which maps directly to how the human eye actually perceives color differences.
+4. **The Matching Engine:** Computes the highly optimized $\Delta E_{00}$ (CIE2000) distance between the user's isolated LAB coordinates and a pre-cleaned dataset of foundation shades, filtering for the top 3 perceptually perfect matches across unique cosmetic brands.
 
 ## Tech Stack
 
@@ -49,9 +49,11 @@ Current virtual shade-matching tools fail consumers across several critical tech
 
 ## Contributors
 
-- **Yasin** - Lead Engineer: Backend API architecture, DevOps deployment, and computer vision integration
-- **Anood** - Co-Creator & Product Strategy: Architected the 5-point spatial averaging algorithm, defined the cross-brand recommendation logic, served as the Domain Expert on cosmetic color theory, and led UI/UX testing
+- **Yasin** - Lead Engineer: Backend API architecture, DevOps deployment, dynamic computer vision integration, and statistical mathematics pipeline.
+- **Anood** - Lead Designer & Co-Creator: Architected the Single Page Application (SPA) UI/UX, led frontend web development, and served as the Domain Expert on cosmetic color theory and user testing.
 
 ## Live Demo
+
+**[https://lumina-foundation.vercel.app/]**
 
 **[https://lumina-foundation.vercel.app/]**
