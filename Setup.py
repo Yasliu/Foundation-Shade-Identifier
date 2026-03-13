@@ -27,12 +27,10 @@ def find_comparison(image):
     print("Cropping image...")
     h, w, _ = image.shape
 
-    image_float = image.astype(np.float32) / 255.0
-
     #extract landmarks
 
     # loading the image here
-    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image_float)
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image)
     detection_result = landmarker.detect(mp_image)
             
     if detection_result.face_landmarks:
@@ -47,8 +45,10 @@ def find_comparison(image):
             polygon = np.array([[int(face[i].x * w), int(face[i].y * h)] for i in indices], dtype=np.int32)
             mask = np.zeros((h,w), dtype=np.uint8)
             cv2.fillPoly(mask, [polygon], 255)
-            pixels = image_float[mask > 0]
-            pixel_reshaped = pixels.reshape(1, -1, 3)
+            pixels = image[mask > 0]
+
+            pixels_float = pixels.astype(np.float32) / 255.0
+            pixel_reshaped = pixels_float.reshape(1, -1, 3)
             return cv2.cvtColor(pixel_reshaped, cv2.COLOR_RGB2LAB)[0]
 
         left_lab = get_cheek_lab(left_cheek_indices)
