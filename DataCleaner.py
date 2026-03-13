@@ -35,18 +35,23 @@ print(df1_final.info())
 
 def hex_to_lab(hex_str):
     try:
-        hex_str = hex_str.lstrip('#')
+        if pd.isna(hex_str):
+            return pd.Series([np.nan, np.nan, np.nan])
+
+        hex_str = str(hex_str).lstrip('#')
         # hex slics to integers
         r, g, b = tuple(int(hex_str[i:i+2], 16) for i in (0, 2, 4))
     
-        rgb_pixel = np.array([[[b, g, r]]], dtype=np.uint8)
+        rgb_pixel = np.array([[[r, g, b]]], dtype=np.float32)
+        rgb_pixel = (rgb_pixel / 255.0).astype(np.float32)
     
         # convert to Lab
-        lab_pixel = cv2.cvtColor(rgb_pixel, cv2.COLOR_BGR2LAB)
+        lab_pixel = cv2.cvtColor(rgb_pixel, cv2.COLOR_RGB2LAB)
         L_val, a_val, b_val = lab_pixel[0][0]
     
         return pd.Series([L_val, a_val, b_val])
-    except e:
+    except Exception as e:
+        print(f"Error on hex {hex_str}: {e}")
         return pd.Series([np.nan, np.nan, np.nan])
         
    
