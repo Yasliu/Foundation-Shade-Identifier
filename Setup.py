@@ -40,8 +40,9 @@ def find_comparison(image):
         # we are going for the left cheek polygon
         left_cheek_indices = [117, 118, 101, 121, 47, 126, 209]
         right_cheek_indices = [346, 347, 330, 350, 277, 355, 429]
+        forehead_indices = [10, 338, 297, 332, 284, 251, 21, 54, 103, 67, 109]
 
-        def get_cheek_lab(indices):
+        def get_lab(indices):
             polygon = np.array([[int(face[i].x * w), int(face[i].y * h)] for i in indices], dtype=np.int32)
             mask = np.zeros((h,w), dtype=np.uint8)
             cv2.fillPoly(mask, [polygon], 255)
@@ -50,20 +51,24 @@ def find_comparison(image):
             pixel_reshaped = pixels_float.reshape(1, -1, 3)
             return cv2.cvtColor(pixel_reshaped, cv2.COLOR_RGB2LAB)[0]
 
-        left_lab = get_cheek_lab(left_cheek_indices)
-        right_lab = get_cheek_lab(right_cheek_indices)
+        left_lab = get_lab(left_cheek_indices)
+        right_lab = get_lab(right_cheek_indices)
+        forehead_lab = get_lab(forehead_indices)
 
         left_mean_L = left_lab[:, 0].mean()
         right_mean_L = right_lab[:, 0].mean()
+        forehead_mean_L = forehead_lab[:, 0].mean()
 
-        if right_mean_L > left_mean_L:
-            best_cheek_lab = right_lab
+        if right_mean_L > left_mean_L and right_mean_L > forehead_mean_L:
+            best_lab = right_lab
+        elif left_mean_L > right_mean_L and left_mean_L > forehead_mean_L:
+            best_lab = left_lab
         else:
-            best_cheek_lab = left_lab
+            best_lab = forehead_lab
 
         # sort based on lightness
-        sorted_indices = best_cheek_lab[:, 0].argsort()
-        sorted_labs = best_cheek_lab[sorted_indices]
+        sorted_indices = best_lab[:, 0].argsort()
+        sorted_labs = best_lab[sorted_indices]
 
         num_pixels = len(sorted_labs)
         lower_bound = int(num_pixels * 0.40)
