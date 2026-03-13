@@ -98,7 +98,23 @@ def find_my_match(target_lab):
 
     # Ensuring non-duplicate brands for variation
     unique_brands_df = temp_df.drop_duplicates(subset=['brand'], keep='first')
+    anchors = unique_brands_df.head(3)
 
-    top_3 = unique_brands_df.head(3)[['brand','product','name','hex']].copy()
+    final_results = []
+    for _, anchor in anchors.iterrows():
+        # Ensuring same brand and product
+        brand_shades = df[(df['brand'] == anchor['brand']) & (df['product'] == anchor['product'])]
+
+        # sorting by lightness 
+        lighter_shades = brand_shades[brand_shades['L_val'] > anchor['L_val']].sort_values('L_val')
+
+        # finding the closest match
+        if not lighter_shades.empty:
+            lighter_match = lighter_shades.iloc[0]
+            final_results.append(lighter_match[['brand', 'product', 'name', 'hex']])
+        else:
+            final_results.append(anchor[['brand', 'product', 'name', 'hex']])
+
+    top_3 = pd.DataFrame(final_results).to_dict(orient='records')
 
     return top_3    
